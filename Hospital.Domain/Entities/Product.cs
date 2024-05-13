@@ -1,6 +1,5 @@
-﻿namespace Hospital.Domain.Entities
-{
-    internal class Product
-    {
-    }
+﻿namespace Hospital.Domain.Entities;
+
+public class Product
+{   
 }
