@@ -25,7 +25,8 @@ public class UserRepository : IUserRepository
 
     public async Task<User> DeleteAsync(User user)
     {
-        context.Users.Remove(user);
+        user.IsDeleted = true;
+        context.Users.Update(user);
         return await Task.FromResult(user);
     }
 
@@ -38,12 +39,12 @@ public class UserRepository : IUserRepository
 
     public async Task<IEnumerable<User>> SelectAllAsEnumerableAsync()
     {
-        return await context.Users.ToListAsync();
+        return await context.Users.Where(user => !user.IsDeleted).ToListAsync();
     }
 
     public async Task<IQueryable<User>> SelectAllAsQuerableAsync()
     {
-        return await Task.FromResult(context.Users.AsQueryable());
+        return await Task.FromResult(context.Users.AsQueryable().Where(user => !user.IsDeleted));
     }
 
     public async Task<bool> SaveAsync()
