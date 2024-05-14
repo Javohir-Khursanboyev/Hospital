@@ -25,4 +25,15 @@ public static class Mapper
             Email = model.Email
         };
     }
+
+    public static IEnumerable<UserViewModel> Map(IEnumerable<User> models)
+    {
+        return models.Select(user => new UserViewModel
+        {
+            Id = user.Id,
+            Email = user.Email,
+            LastName = user.LastName,
+            FirstName = user.FirstName
+        });
+    }
 }

@@ -14,9 +14,9 @@ public class UserService : IUserService
 
     public async Task<UserViewModel> CreateAsync(UserCreateModel model)
     {
-        var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Email == model.Email && ! user.isDeleted);
+        var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Email == model.Email && !user.IsDeleted);
         if (existUser is not null)
-            throw new Exception("User is already exist");
+            throw new Exception($"User is already exist with this email {model.Email}");
 
         var user = Mapper.Map(model);
         var createdUser = await userRepository.InsertAsync(user);
@@ -25,23 +25,45 @@ public class UserService : IUserService
         return Mapper.Map(createdUser);
     }
 
-    public Task<UserViewModel> DeleteAsync(long id)
+    public async Task<UserViewModel> UpdateAsync(long id, UserUpdateModel model)
     {
-        throw new NotImplementedException();
+        var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
+            ?? throw new Exception($"User is not found with this Id {id}");
+
+        existUser.Email = model.Email;
+        existUser.LastName = model.LastName;
+        existUser.FirstName = model.FirstName;
+        existUser.UpdatedAt = DateTime.UtcNow;
+
+        var updatedUser = await userRepository.UpdateAsync(existUser);
+        await userRepository.SaveAsync();
+
+        return Mapper.Map(updatedUser);
     }
 
-    public Task<IEnumerable<UserViewModel>> GetAllAsync()
+    public async Task<bool> DeleteAsync(long id)
     {
-        throw new NotImplementedException();
+        var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
+           ?? throw new Exception($"User is not found with this Id {id}");
+
+        existUser.DeletedAt = DateTime.UtcNow;
+        await userRepository.DeleteAsync(existUser);
+        await userRepository.SaveAsync();
+
+        return true;
     }
 
-    public Task<UserViewModel> GetByIdAsync(long id)
+    public async Task<UserViewModel> GetByIdAsync(long id)
     {
-        throw new NotImplementedException();
+        var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
+           ?? throw new Exception($"User is not found with this Id {id}");
+
+        return Mapper.Map(existUser);
     }
 
-    public Task<UserViewModel> UpdateAsync(long id, UserUpdateModel model)
+    public async Task<IEnumerable<UserViewModel>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var users = await userRepository.SelectAllAsEnumerableAsync();
+        return Mapper.Map(users);
     }
 }
