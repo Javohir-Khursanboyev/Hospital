@@ -8,5 +8,5 @@ namespace Hospital.Service.Services.Doctors
 {
     internal interface IDoctorService
     {
-    }
+    } 
 }

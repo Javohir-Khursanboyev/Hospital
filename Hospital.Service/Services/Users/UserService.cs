@@ -1,5 +1,6 @@
 ﻿using Hospital.Data.Repositories;
 using Hospital.Service.DTOs.Users;
+using Hospital.Service.Exceptions;
 using Hospital.Service.Mappers;
 
 namespace Hospital.Service.Users;
@@ -16,7 +17,7 @@ public class UserService : IUserService
     {
         var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Email == model.Email && !user.IsDeleted);
         if (existUser is not null)
-            throw new Exception($"User is already exist with this email {model.Email}");
+            throw new AlreadyExistException($"User is already exist with this email {model.Email}");
 
         var user = Mapper.Map(model);
         var createdUser = await userRepository.InsertAsync(user);
@@ -28,7 +29,7 @@ public class UserService : IUserService
     public async Task<UserViewModel> UpdateAsync(long id, UserUpdateModel model)
     {
         var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
-            ?? throw new Exception($"User is not found with this Id {id}");
+            ?? throw new NotFoundException($"User is not found with this id: {id}");
 
         existUser.Email = model.Email;
         existUser.LastName = model.LastName;
@@ -44,7 +45,7 @@ public class UserService : IUserService
     public async Task<bool> DeleteAsync(long id)
     {
         var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
-           ?? throw new Exception($"User is not found with this Id {id}");
+           ?? throw new NotFoundException($"User is not found with this Id {id}");
 
         existUser.DeletedAt = DateTime.UtcNow;
         await userRepository.DeleteAsync(existUser);
@@ -56,7 +57,7 @@ public class UserService : IUserService
     public async Task<UserViewModel> GetByIdAsync(long id)
     {
         var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
-           ?? throw new Exception($"User is not found with this Id {id}");
+           ?? throw new NotFoundException($"User is not found with this Id {id}");
 
         return Mapper.Map(existUser);
     }
