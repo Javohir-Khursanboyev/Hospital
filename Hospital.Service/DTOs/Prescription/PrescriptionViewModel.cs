@@ -1,14 +1,13 @@
-﻿using Hospital.Domain.Entities;
+﻿using Hospital.Service.DTOs.Doctors;
+using Hospital.Service.DTOs.Users;
 
 namespace Hospital.Service.DTOs.Prescription
 {
     public class PrescriptionViewModel
     {
         public long Id { get; set; }
-        public long UserId { get; set; }
-        public User User { get; set; }
-        public long DoctorId { get; set; }
-        public Doctor Doctor { get; set; }
+        public UserViewModel User { get; set; }
+        public DoctorViewModel Doctor { get; set; }
         public DateTime DateTime { get; set; }
     }
 }
