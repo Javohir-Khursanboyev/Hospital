@@ -73,10 +73,11 @@ public static class Mapper
         };
     }
 
-    public static IEnumerable<Doctor> Map(IEnumerable<Doctor> models)
+    public static IEnumerable<DoctorViewModel> Map(IEnumerable<Doctor> models)
     {
-        return models.Select(model => new Doctor
+        return models.Select(model => new DoctorViewModel
         {
+            Id =  model.Id,
             FirstName = model.FirstName,
             LastName = model.LastName,
             Email = model.Email,
