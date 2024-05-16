@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hospital.Data", "Hospital.Data\Hospital.Data.csproj", "{6F1ED244-1C77-4FAD-A330-AF54370D5167}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hospital.Data", "Hospital.Data\Hospital.Data.csproj", "{6F1ED244-1C77-4FAD-A330-AF54370D5167}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hospital.Domain", "Hospital.Domain\Hospital.Domain.csproj", "{0F155EB2-DFB5-49D6-A3F0-C6731CF124DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hospital.Domain", "Hospital.Domain\Hospital.Domain.csproj", "{0F155EB2-DFB5-49D6-A3F0-C6731CF124DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hospital.Service", "Hospital.Service\Hospital.Service.csproj", "{4BC74297-02B8-49FC-B25B-B4B0860C3318}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hospital.Service", "Hospital.Service\Hospital.Service.csproj", "{4BC74297-02B8-49FC-B25B-B4B0860C3318}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hospital.WebApi", "Hospital.WebApi\Hospital.WebApi.csproj", "{10309C40-EF6E-4B0B-9BFB-C406A7B18645}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hospital.WebApi", "Hospital.WebApi\Hospital.WebApi.csproj", "{10309C40-EF6E-4B0B-9BFB-C406A7B18645}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
