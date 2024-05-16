@@ -4,7 +4,7 @@
     {
         public long PrescriptionId { get; set; }
         public string MedicineName { get; set; }
-        public string MedicineUsage { get; }
+        public string MedicineUsage { get; set; }
         public int Days { get; set; }
     }
 }
