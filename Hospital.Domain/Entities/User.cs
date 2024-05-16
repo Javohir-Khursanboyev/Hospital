@@ -10,4 +10,5 @@ public class User : Auditable
     public string Password { get; set; }
     public ICollection<Appointment> Appointments { get; set; }
     public ICollection<Prescription> Prescriptions { get; set; }
+    public UserContact Contact { get; set; }
 }
