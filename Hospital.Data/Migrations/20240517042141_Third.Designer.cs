@@ -3,6 +3,7 @@ using System;
 using Hospital.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Hospital.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240517042141_Third")]
+    partial class Third
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,35 +61,6 @@ namespace Hospital.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Appointments");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9849),
-                            DateTime = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9850),
-                            DoctorId = 1L,
-                            IsDeleted = false,
-                            UserId = 1L
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9851),
-                            DateTime = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9851),
-                            DoctorId = 2L,
-                            IsDeleted = false,
-                            UserId = 2L
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9852),
-                            DateTime = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9852),
-                            DoctorId = 3L,
-                            IsDeleted = false,
-                            UserId = 3L
-                        });
                 });
 
             modelBuilder.Entity("Hospital.Domain.Entities.Doctor", b =>
@@ -127,41 +101,6 @@ namespace Hospital.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Doctors");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9828),
-                            Email = "email@gmail.com",
-                            FirstName = "Umidjon",
-                            IsDeleted = false,
-                            LastName = "Maxammadsoliyev",
-                            Password = "Password",
-                            Position = "Dentist"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9832),
-                            Email = "email@gmail.com",
-                            FirstName = "Odiljon",
-                            IsDeleted = false,
-                            LastName = "Maxammadsoliyev",
-                            Password = "Password",
-                            Position = "Dentist"
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9833),
-                            Email = "email@gmail.com",
-                            FirstName = "Valijon",
-                            IsDeleted = false,
-                            LastName = "Maxammadsoliyev",
-                            Password = "Password",
-                            Position = "Dentist"
-                        });
                 });
 
             modelBuilder.Entity("Hospital.Domain.Entities.Prescription", b =>
@@ -200,26 +139,6 @@ namespace Hospital.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Prescriptions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9868),
-                            DateTime = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9871),
-                            DoctorId = 1L,
-                            IsDeleted = false,
-                            UserId = 1L
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9871),
-                            DateTime = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9872),
-                            DoctorId = 3L,
-                            IsDeleted = false,
-                            UserId = 2L
-                        });
                 });
 
             modelBuilder.Entity("Hospital.Domain.Entities.PrescriptionItem", b =>
@@ -259,48 +178,6 @@ namespace Hospital.Data.Migrations
                     b.HasIndex("PrescriptionId");
 
                     b.ToTable("PrescriptionItems");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9891),
-                            Days = 11,
-                            IsDeleted = false,
-                            MedicineName = "Dori",
-                            MedicineUsage = "Ichiladi",
-                            PrescriptionId = 1L
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9893),
-                            Days = 11,
-                            IsDeleted = false,
-                            MedicineName = "sdsds",
-                            MedicineUsage = "sdsd",
-                            PrescriptionId = 1L
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9894),
-                            Days = 11,
-                            IsDeleted = false,
-                            MedicineName = "Dori",
-                            MedicineUsage = "Ichiladi",
-                            PrescriptionId = 2L
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9895),
-                            Days = 11,
-                            IsDeleted = false,
-                            MedicineName = "DoriDarmon",
-                            MedicineUsage = "Ichiladi",
-                            PrescriptionId = 2L
-                        });
                 });
 
             modelBuilder.Entity("Hospital.Domain.Entities.User", b =>
@@ -338,48 +215,6 @@ namespace Hospital.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9675),
-                            Email = "Valijonov@gmail.com",
-                            FirstName = "Ali",
-                            IsDeleted = false,
-                            LastName = "Valiyev",
-                            Password = "Password"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9679),
-                            Email = "Valijonov@gmail.com",
-                            FirstName = "Ali",
-                            IsDeleted = false,
-                            LastName = "Valiyev",
-                            Password = "Password"
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9680),
-                            Email = "Valijonov@gmail.com",
-                            FirstName = "Ali",
-                            IsDeleted = false,
-                            LastName = "Valiyev",
-                            Password = "Password"
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9681),
-                            Email = "Valijonov@gmail.com",
-                            FirstName = "Ali",
-                            IsDeleted = false,
-                            LastName = "Valiyev",
-                            Password = "Password"
-                        });
                 });
 
             modelBuilder.Entity("Hospital.Domain.Entities.UserContact", b =>
@@ -417,35 +252,6 @@ namespace Hospital.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("UserContacts");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Address = "Andijon Shahri",
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9802),
-                            IsDeleted = false,
-                            Phone = "+9989901233567",
-                            UserId = 3L
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Address = "Qarshi Shahri",
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9805),
-                            IsDeleted = false,
-                            Phone = "+9989901234567",
-                            UserId = 4L
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            Address = "Toshkent Shahri",
-                            CreatedAt = new DateTime(2024, 5, 17, 4, 52, 33, 323, DateTimeKind.Utc).AddTicks(9813),
-                            IsDeleted = false,
-                            Phone = "+9989901234567",
-                            UserId = 2L
-                        });
                 });
 
             modelBuilder.Entity("Hospital.Domain.Entities.Appointment", b =>

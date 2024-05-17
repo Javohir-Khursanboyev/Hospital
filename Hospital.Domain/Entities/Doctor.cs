@@ -9,4 +9,6 @@ public class Doctor : Auditable
     public string Email { get; set; }
     public string Password { get; set; }
     public string Position { get; set; }
+    public ICollection<Appointment> Appointments { get; set; }
+    public ICollection<Prescription> Prescriptions { get; set; }
 }

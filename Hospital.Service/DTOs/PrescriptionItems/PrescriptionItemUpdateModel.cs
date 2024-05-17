@@ -8,4 +8,3 @@
         public int Days { get; set; }
     }
 }
-}
