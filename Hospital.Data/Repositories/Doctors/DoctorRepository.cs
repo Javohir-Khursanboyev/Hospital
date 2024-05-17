@@ -17,32 +17,10 @@ public class DoctorRepository : IDoctorRepository
         return (await context.Doctors.AddAsync(doctor)).Entity;
     }
 
-    public async Task<IEnumerable<Doctor>> SelectAllAsEnumerableAsync()
-    {
-        return await context.Doctors.Where(doctor => !doctor.IsDeleted).ToListAsync();
-    }
-
-    public async Task<IQueryable<Doctor>> SelectAllAsQuerableAsync()
-    {
-        return await Task.FromResult(context.Doctors.AsQueryable().Where(doctor => !doctor.IsDeleted));
-    }
-
-    public async Task<Doctor> SelectAsync(long id)
-    {
-#pragma warning disable CS8603 // Possible null reference return.
-        return await context.Doctors.FirstOrDefaultAsync(x => x.Id == id);
-#pragma warning restore CS8603 // Possible null reference return.
-    }
-
     public async Task<Doctor> UpdateAsync(Doctor doctor)
     {
         context.Doctors.Update(doctor);
         return await Task.FromResult(doctor);
-    }
-
-    public async Task<bool> SaveAsync()
-    {
-        return (await context.SaveChangesAsync()) > 0;
     }
 
     public async Task<Doctor> DeleteAsync(Doctor doctor)
@@ -50,5 +28,32 @@ public class DoctorRepository : IDoctorRepository
         doctor.IsDeleted = true;
         context.Doctors.Update(doctor);
         return await Task.FromResult(doctor);
+    }
+
+    public async Task<Doctor> SelectAsync(long id, string[] includes = null)
+    {
+        var doctors = context.Doctors;
+        if(includes is not null) 
+            foreach(var include in includes) 
+                doctors.Include(include);
+
+        var doctor = await doctors.Where(doctor => !doctor.IsDeleted).FirstOrDefaultAsync();
+        return doctor;
+    }
+    public async Task<IEnumerable<Doctor>> SelectAllAsEnumerableAsync()
+    {
+        var doctors = context.Doctors.Include("Appointments").Include("Prescriptions");
+        return await doctors.Where(doctor => !doctor.IsDeleted).ToListAsync();
+    }
+
+    public async Task<IQueryable<Doctor>> SelectAllAsQuerableAsync()
+    {
+        var doctors = context.Doctors.Include("Appointments").Include("Prescriptions");
+        return await Task.FromResult(doctors.AsQueryable().Where(doctor => !doctor.IsDeleted));
+    }
+
+    public async Task<bool> SaveAsync()
+    {
+        return (await context.SaveChangesAsync()) > 0;
     }
 }
