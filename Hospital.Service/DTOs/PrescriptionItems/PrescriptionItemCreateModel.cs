@@ -10,4 +10,4 @@ namespace Hospital.Service.DTOs.PrescriptionItems
         public int Days { get; set; }
     }
 }
-}
+

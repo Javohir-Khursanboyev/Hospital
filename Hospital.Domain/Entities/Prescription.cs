@@ -9,4 +9,5 @@ public class Prescription : Auditable
     public long DoctorId { get; set; }
     public Doctor Doctor { get; set; }
     public DateTime DateTime { get; set; }
+    public ICollection<PrescriptionItem> Items { get; set; }
 }
