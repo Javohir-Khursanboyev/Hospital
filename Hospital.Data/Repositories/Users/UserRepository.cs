@@ -30,11 +30,17 @@ public class UserRepository : IUserRepository
         return await Task.FromResult(user);
     }
 
-    public async Task<User> SelectAsync(long id)
+    public async Task<User> SelectAsync(long id, string[] includes = null)
     {
-#pragma warning disable CS8603 // Possible null reference return.
-        return await context.Users.FirstOrDefaultAsync(x => x.Id == id);
-#pragma warning restore CS8603 // Possible null reference return.
+       var users = context.Users;
+
+       if(includes is not null)
+            foreach (var include in includes)
+                users.Include(include);
+
+        var user = await users.Where(u => u.Id == id && !u.IsDeleted).FirstAsync();
+
+        return user;
     }
 
     public async Task<IEnumerable<User>> SelectAllAsEnumerableAsync()
@@ -44,7 +50,9 @@ public class UserRepository : IUserRepository
 
     public async Task<IQueryable<User>> SelectAllAsQuerableAsync()
     {
-        return await Task.FromResult(context.Users.AsQueryable().Where(user => !user.IsDeleted));
+        var users = context.Users.Include("Appointments").Include("Prescriptions").Include("Prescriptions");
+        users = await Task.FromResult(users.Where(user => !user.IsDeleted));
+        return users;
     }
 
     public async Task<bool> SaveAsync()

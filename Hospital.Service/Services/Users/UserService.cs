@@ -28,7 +28,7 @@ public class UserService : IUserService
 
     public async Task<UserViewModel> UpdateAsync(long id, UserUpdateModel model)
     {
-        var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
+        var existUser = await userRepository.SelectAsync(id)
             ?? throw new NotFoundException($"User is not found with this id: {id}");
 
         existUser.Email = model.Email;
@@ -44,7 +44,7 @@ public class UserService : IUserService
 
     public async Task<bool> DeleteAsync(long id)
     {
-        var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
+        var existUser = await userRepository.SelectAsync(id)
            ?? throw new NotFoundException($"User is not found with this Id {id}");
 
         existUser.DeletedAt = DateTime.UtcNow;
@@ -56,7 +56,7 @@ public class UserService : IUserService
 
     public async Task<UserViewModel> GetByIdAsync(long id)
     {
-        var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Id == id && !user.IsDeleted)
+        var existUser = await userRepository.SelectAsync(id, ["Appointments" , "Contact", "Prescriptions"])
            ?? throw new NotFoundException($"User is not found with this Id {id}");
 
         return Mapper.Map(existUser);
