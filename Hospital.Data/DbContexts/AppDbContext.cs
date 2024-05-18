@@ -20,6 +20,37 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Appointment>()
+            .HasOne(appointment => appointment.Doctor)
+            .WithMany(doctor => doctor.Appointments)
+            .HasForeignKey(appoiintment => appoiintment.DoctorId);
+
+        modelBuilder.Entity<Appointment>()
+            .HasOne(appointment => appointment.User)
+            .WithMany(user => user.Appointments)
+            .HasForeignKey(appointment => appointment.UserId);
+
+        modelBuilder.Entity<Prescription>()
+            .HasOne(prescription => prescription.Doctor)
+            .WithMany(doctor => doctor.Prescriptions)
+            .HasForeignKey(prescription => prescription.DoctorId);
+
+        modelBuilder.Entity<Prescription>()
+            .HasOne(prescription => prescription.User)
+            .WithMany(user => user.Prescriptions)
+           .HasForeignKey(prescription => prescription.UserId);
+
+        modelBuilder.Entity<PrescriptionItem>()
+            .HasOne(prescriptionItem => prescriptionItem.Prescription)
+            .WithMany(prescription => prescription.Items)
+            .HasForeignKey(prescriptionItem => prescriptionItem.PrescriptionId);
+
+        modelBuilder.Entity<UserContact>()
+            .HasOne(userContact => userContact.User)
+            .WithOne(user => user.Contact)
+            .HasForeignKey<UserContact>(userContact => userContact.UserId);
+
+
         modelBuilder.Entity<User>()
             .HasData(
                 new User
