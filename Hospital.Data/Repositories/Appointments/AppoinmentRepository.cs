@@ -30,21 +30,27 @@ namespace Hospital.Data.Repositories.Appointments
             return await Task.FromResult(appointment);
         }
 
-        public async Task<Appointment> SelectAsync(long id)
+        public async Task<Appointment> SelectAsync(long id, string[] includes = null)
         {
-            #pragma warning disable CS8603 // Possible null reference return.
-            return await context.Appointments.FirstOrDefaultAsync(a => a.Id == id);
-            #pragma warning restore CS8603 // Possible null reference return.
+            var appointments = context.Appointments;
+            if(includes is not null) 
+                foreach(var include in includes)
+                    appointments.Include(include);
+
+            var appointment = await appointments.Where(app => !app.IsDeleted).FirstOrDefaultAsync();
+            return appointment;
         }
 
         public async Task<IEnumerable<Appointment>> SelectAllAsEnumerableAsync()
         {
-            return await context.Appointments.Where(appointment => !appointment.IsDeleted).ToListAsync();
+            var appointments = context.Appointments.Include("User").Include("Doctor");
+            return await appointments.Where(appointment => !appointment.IsDeleted).ToListAsync();
         }
 
         public async Task<IQueryable<Appointment>> SelectAllAsQuerableAsync()
         {
-            return await Task.FromResult(context.Appointments.AsQueryable().Where(appointment => !appointment.IsDeleted));
+            var appointments = context.Appointments.Include("User").Include("Doctor");
+            return await Task.FromResult(appointments.AsQueryable().Where(appointment => !appointment.IsDeleted));
         }
 
         public async Task<bool> SaveAsync()

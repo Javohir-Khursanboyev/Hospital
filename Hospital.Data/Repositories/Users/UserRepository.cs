@@ -45,14 +45,14 @@ public class UserRepository : IUserRepository
 
     public async Task<IEnumerable<User>> SelectAllAsEnumerableAsync()
     {
-        return await context.Users.Where(user => !user.IsDeleted).ToListAsync();
+        var users = context.Users.Include("Appointments").Include("Prescriptions").Include("Prescriptions");
+        return await Task.FromResult(users.Where(user => !user.IsDeleted));
     }
 
     public async Task<IQueryable<User>> SelectAllAsQuerableAsync()
     {
         var users = context.Users.Include("Appointments").Include("Prescriptions").Include("Prescriptions");
-        users = await Task.FromResult(users.Where(user => !user.IsDeleted));
-        return users;
+        return await Task.FromResult(users.AsQueryable().Where(user => !user.IsDeleted));        
     }
 
     public async Task<bool> SaveAsync()

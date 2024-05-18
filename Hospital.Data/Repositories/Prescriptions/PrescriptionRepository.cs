@@ -17,33 +17,12 @@ public class PrescriptionRepository : IPrescriptionRepository
         return (await context.Prescriptions.AddAsync(prescription)).Entity;
     }
 
-    public async Task<bool> SaveAsync()
-    {
-        return (await context.SaveChangesAsync()) > 0;  //  we use > 0 🧘
-    }
-
-    public async Task<IEnumerable<Prescription>> SelectAllAsEnumerableAsync()
-    {
-        return await context.Prescriptions.Where(pr => !pr.IsDeleted).ToListAsync();
-    }
-
-    public async Task<IQueryable<Prescription>> SelectAllAsQuerableAsync()
-    {
-        return await Task.FromResult(context.Prescriptions.AsQueryable().Where(pr => !pr.IsDeleted));
-    }
-
-    public async Task<Prescription> SelectAsync(long id)
-    {
-#pragma warning disable CS8603 // Possible null reference return.
-        return await context.Prescriptions.FirstOrDefaultAsync(x => x.Id == id);
-#pragma warning restore CS8603 // Possible null reference return.
-    }
-
     public async Task<Prescription> UpdateAsync(Prescription prescription)
     {
         context.Prescriptions.Update(prescription);
         return await Task.FromResult(prescription);
     }
+
     public async Task<Prescription> DeleteAsync(Prescription prescription)
     {
         prescription.IsDeleted = true;
@@ -51,4 +30,31 @@ public class PrescriptionRepository : IPrescriptionRepository
         return await Task.FromResult(prescription);
     }
 
+    public async Task<Prescription> SelectAsync(long id, string include = null)
+    {
+        var prescriptions = context.Prescriptions;
+        if (include is not null)
+            prescriptions.Include(include);
+
+        var prescription = await prescriptions.Where(pr => !pr.IsDeleted && pr.Id == id).FirstOrDefaultAsync();
+
+        return prescription;
+    }
+
+    public async Task<IEnumerable<Prescription>> SelectAllAsEnumerableAsync()
+    {
+        var prescriptions = context.Prescriptions.Include("Items");
+        return await prescriptions.Where(pr => !pr.IsDeleted).ToListAsync();
+    }
+
+    public async Task<IQueryable<Prescription>> SelectAllAsQuerableAsync()
+    {
+        var prescriptions = context.Prescriptions.Include("Items");
+        return await Task.FromResult(prescriptions.AsQueryable().Where(pr => !pr.IsDeleted));
+    }
+
+    public async Task<bool> SaveAsync()
+    {
+        return (await context.SaveChangesAsync()) > 0;  //  we use > 0 🧘
+    }
 }
