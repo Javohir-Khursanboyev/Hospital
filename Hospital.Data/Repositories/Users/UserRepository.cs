@@ -43,15 +43,23 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<IEnumerable<User>> SelectAllAsEnumerableAsync()
+    public async Task<IEnumerable<User>> SelectAllAsEnumerableAsync(bool isTraking = true)
     {
         var users = context.Users.Include("Appointments").Include("Prescriptions").Include("Prescriptions");
+
+        if (!isTraking)
+            users.AsNoTracking();
+
         return await Task.FromResult(users.Where(user => !user.IsDeleted));
     }
 
-    public async Task<IQueryable<User>> SelectAllAsQuerableAsync()
+    public async Task<IQueryable<User>> SelectAllAsQuerableAsync(bool isTraking = true)
     {
         var users = context.Users.Include("Appointments").Include("Prescriptions").Include("Prescriptions");
+
+        if (!isTraking)
+            users.AsNoTracking();
+
         return await Task.FromResult(users.AsQueryable().Where(user => !user.IsDeleted));        
     }
 

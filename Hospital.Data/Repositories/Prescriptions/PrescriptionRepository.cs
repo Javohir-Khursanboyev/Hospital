@@ -41,15 +41,23 @@ public class PrescriptionRepository : IPrescriptionRepository
         return prescription;
     }
 
-    public async Task<IEnumerable<Prescription>> SelectAllAsEnumerableAsync()
+    public async Task<IEnumerable<Prescription>> SelectAllAsEnumerableAsync(string[] includes = null)
     {
-        var prescriptions = context.Prescriptions.Include("Items");
+        var prescriptions = context.Prescriptions;
+        if (includes is not null)
+            foreach (var include in includes)
+                prescriptions.Include(include);
+
         return await prescriptions.Where(pr => !pr.IsDeleted).ToListAsync();
     }
 
-    public async Task<IQueryable<Prescription>> SelectAllAsQuerableAsync()
+    public async Task<IQueryable<Prescription>> SelectAllAsQuerableAsync(string[] includes = null)
     {
-        var prescriptions = context.Prescriptions.Include("Items");
+        var prescriptions = context.Prescriptions;
+        if(includes is not null)
+            foreach (var include in includes)
+                prescriptions.Include(include);
+
         return await Task.FromResult(prescriptions.AsQueryable().Where(pr => !pr.IsDeleted));
     }
 

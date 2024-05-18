@@ -1,6 +1,7 @@
 ﻿using Hospital.Data.Repositories;
 using Hospital.Service.DTOs.Users;
 using Hospital.Service.Exceptions;
+using Hospital.Service.Helpers;
 using Hospital.Service.Mappers;
 
 namespace Hospital.Service.Users;
@@ -20,6 +21,7 @@ public class UserService : IUserService
             throw new AlreadyExistException($"User is already exist with this email {model.Email}");
 
         var user = Mapper.Map(model);
+        user.Password = PasswordHasher.Hash(model.Password);
         var createdUser = await userRepository.InsertAsync(user);
         await userRepository.SaveAsync();
 
@@ -56,7 +58,7 @@ public class UserService : IUserService
 
     public async Task<UserViewModel> GetByIdAsync(long id)
     {
-        var existUser = await userRepository.SelectAsync(id, ["Appointments" , "Contact", "Prescriptions"])
+        var existUser = await userRepository.SelectAsync(id, includes: ["Appointments" , "Contact", "Prescriptions"], isTraking: false)
            ?? throw new NotFoundException($"User is not found with this Id {id}");
 
         return Mapper.Map(existUser);
