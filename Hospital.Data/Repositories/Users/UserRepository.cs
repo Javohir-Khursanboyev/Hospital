@@ -7,9 +7,9 @@ namespace Hospital.Data.Repositories;
 public class UserRepository : IUserRepository
 {
     private AppDbContext context;
-    public UserRepository(AppDbContext context)
+    public UserRepository(AppDbContext appDbContext)
     {
-        this.context = context;
+        this.context = appDbContext;
     }
 
     public async Task<User> InsertAsync(User user)

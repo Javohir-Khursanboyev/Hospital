@@ -25,6 +25,7 @@ public static class Mapper
     {
         return new UserViewModel
         {
+            Id = model.Id,
             Email = model.Email,
             LastName = model.LastName,
             FirstName = model.FirstName,
