@@ -6,14 +6,8 @@ using Hospital.Service.Mappers;
 
 namespace Hospital.Service.Users;
 
-public class UserService : IUserService
+public class UserService (IUserRepository userRepository) : IUserService
 {
-    private readonly IUserRepository userRepository;
-    public UserService(IUserRepository userRepository)
-    {
-        this.userRepository = userRepository;
-    }
-
     public async Task<UserViewModel> CreateAsync(UserCreateModel model)
     {
         var existUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(user => user.Email == model.Email && !user.IsDeleted);
@@ -58,7 +52,7 @@ public class UserService : IUserService
 
     public async Task<UserViewModel> GetByIdAsync(long id)
     {
-        var existUser = await userRepository.SelectAsync(id, includes: ["Appointments" , "Contact", "Prescriptions"], isTraking: false)
+        var existUser = await userRepository.SelectAsync(id, includes: ["Appointments" , "Contact", "Prescriptions"])
            ?? throw new NotFoundException($"User is not found with this Id {id}");
 
         return Mapper.Map(existUser);

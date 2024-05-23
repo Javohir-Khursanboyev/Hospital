@@ -6,17 +6,14 @@ namespace Hospital.Data.DbContexts;
 
 public class AppDbContext : DbContext
 {
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {    }
     public DbSet<User> Users { get; set; }
     public DbSet<Doctor> Doctors { get; set; }
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Prescription> Prescriptions { get; set; }
     public DbSet<PrescriptionItem> PrescriptionItems { get; set; }
     public DbSet<UserContact> UserContacts { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseNpgsql("Server=localhost; Database=HospitalDb; Port=5432; User ID=postgres; Password=root");
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
