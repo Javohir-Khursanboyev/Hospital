@@ -1,6 +1,5 @@
 using Hospital.Data.DbContexts;
-using Hospital.Data.Repositories;
-using Hospital.Service.Users;
+using Hospital.Service.Mappers;
 using Hospital.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddDbContext<AppDbContext>
     (option => option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

@@ -1,4 +1,5 @@
-﻿using Hospital.Service.DTOs.Users;
+﻿using Hospital.Service.Configurations;
+using Hospital.Service.DTOs.Users;
 using Hospital.Service.Users;
 using Hospital.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -58,13 +59,13 @@ public class UsersController(IUserService userService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllAsync()
+    public async Task<IActionResult> GetAllAsync([FromQuery]PaginationParams @params)
     {
         return Ok(new Response
         {
             StatusCode = 200,
             Message = "Succes",
-            Data = await userService.GetAllAsync()
+            Data = await userService.GetAllAsync(@params)
         });
     }
 }

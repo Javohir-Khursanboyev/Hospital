@@ -1,12 +1,17 @@
-﻿using Hospital.Data.Repositories;
+﻿using AutoMapper;
+using Hospital.Data.Repositories;
+using Hospital.Domain.Entities;
+using Hospital.Service.Configurations;
 using Hospital.Service.DTOs.Users;
 using Hospital.Service.Exceptions;
+using Hospital.Service.Extensions;
 using Hospital.Service.Helpers;
-using Hospital.Service.Mappers;
 
 namespace Hospital.Service.Users;
 
-public class UserService (IUserRepository userRepository) : IUserService
+public class UserService 
+    (IMapper mapper, 
+    IUserRepository userRepository) : IUserService
 {
     public async Task<UserViewModel> CreateAsync(UserCreateModel model)
     {
@@ -14,12 +19,12 @@ public class UserService (IUserRepository userRepository) : IUserService
         if (existUser is not null)
             throw new AlreadyExistException($"User is already exist with this email {model.Email}");
 
-        var user = Mapper.Map(model);
+        var user = mapper.Map<User>(model);
         user.Password = PasswordHasher.Hash(model.Password);
         var createdUser = await userRepository.InsertAsync(user);
         await userRepository.SaveAsync();
 
-        return Mapper.Map(createdUser);
+        return mapper.Map<UserViewModel>(createdUser);
     }
 
     public async Task<UserViewModel> UpdateAsync(long id, UserUpdateModel model)
@@ -27,15 +32,13 @@ public class UserService (IUserRepository userRepository) : IUserService
         var existUser = await userRepository.SelectAsync(id)
             ?? throw new NotFoundException($"User is not found with this id: {id}");
 
-        existUser.Email = model.Email;
-        existUser.LastName = model.LastName;
-        existUser.FirstName = model.FirstName;
+        mapper.Map(model, existUser);
         existUser.UpdatedAt = DateTime.UtcNow;
 
         var updatedUser = await userRepository.UpdateAsync(existUser);
         await userRepository.SaveAsync();
 
-        return Mapper.Map(updatedUser);
+        return mapper.Map<UserViewModel>(updatedUser);
     }
 
     public async Task<bool> DeleteAsync(long id)
@@ -55,12 +58,15 @@ public class UserService (IUserRepository userRepository) : IUserService
         var existUser = await userRepository.SelectAsync(id, includes: ["Appointments" , "Contact", "Prescriptions"])
            ?? throw new NotFoundException($"User is not found with this Id {id}");
 
-        return Mapper.Map(existUser);
+        return mapper.Map<UserViewModel>(existUser);
     }
 
-    public async Task<IEnumerable<UserViewModel>> GetAllAsync()
+    public async Task<IEnumerable<UserViewModel>> GetAllAsync(PaginationParams @params)
     {
-        var users = await userRepository.SelectAllAsEnumerableAsync();
-        return Mapper.Map(users);
+        var users = await userRepository.SelectAllAsQuerableAsync(["Appointments", "Contact", "Prescriptions"], isTraking: false);
+
+        users = users.ToPaginate(@params);
+
+        return mapper.Map<IEnumerable<UserViewModel>>(users);
     }
 }

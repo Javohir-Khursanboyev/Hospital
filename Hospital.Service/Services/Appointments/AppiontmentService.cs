@@ -19,7 +19,6 @@ namespace Hospital.Service.Services.Appointments
             this.doctorService = doctorService;
         }
 
-
         public async Task<AppointmentViewModel> CreateAsync(AppointmentCreateModel model)
         {
             var existDoctor = doctorService.GetByIdAsync(model.DoctorId);
