@@ -1,23 +1,19 @@
-﻿using Hospital.Data.Repositories.Prescriptions;
+﻿using AutoMapper;
+using Hospital.Data.Repositories.Prescriptions;
+using Hospital.Domain.Entities;
+using Hospital.Service.Configurations;
 using Hospital.Service.DTOs.Prescription;
+using Hospital.Service.DTOs.Users;
 using Hospital.Service.Exceptions;
+using Hospital.Service.Extensions;
 using Hospital.Service.Mappers;
 using Hospital.Service.Services.Doctors;
 using Hospital.Service.Users;
 
 namespace Hospital.Service.Services.Prescriptions;
-public class PrescriptionService : IPrescriptionService
+public class PrescriptionService(
+        IMapper mapper, IPrescriptionRepository prescriptionRepository, IDoctorService doctorService, IUserService userService) : IPrescriptionService
 {
-    private readonly IPrescriptionRepository prescriptionRepository;
-    private readonly IUserService userService;
-    private readonly IDoctorService doctorService;
-    public PrescriptionService(IPrescriptionRepository prescriptionRepository, IDoctorService doctorService, IUserService userService)
-    {
-        this.prescriptionRepository = prescriptionRepository;
-        this.userService = userService;
-        this.doctorService = doctorService;
-    }
-
 
     public async Task<PrescriptionViewModel> CreateAsync(PrescriptionCreateModel model)
     {
@@ -28,11 +24,11 @@ public class PrescriptionService : IPrescriptionService
             .FirstOrDefault(p => p.UserId == model.UserId && p.DoctorId == model.DoctorId && p.DateTime == model.DateTime && !p.IsDeleted)
             ?? throw new AlreadyExistException($"Prescription is already exist with this User {model.UserId} Id and Doctor {model.DoctorId} Id from {model.DateTime}");
 
-        var mappedPrescription = Mapper.Map(model);
+        var mappedPrescription = mapper.Map<Prescription>(model);
         var createdPrescription = await prescriptionRepository.InsertAsync(mappedPrescription);
         await prescriptionRepository.SaveAsync();
 
-        return Mapper.Map(createdPrescription);
+        return mapper.Map<PrescriptionViewModel>(mappedPrescription);
     }
 
     public async Task<bool> DeleteAsync(long id)
@@ -47,18 +43,21 @@ public class PrescriptionService : IPrescriptionService
         return true;
     }
 
-    public async Task<IEnumerable<PrescriptionViewModel>> GetAllAsync()
+    public async Task<IEnumerable<PrescriptionViewModel>> GetAllAsync(PaginationParams @params)
     {
-        var prescriptions = await prescriptionRepository.SelectAllAsEnumerableAsync();
-        return Mapper.Map(prescriptions);
+        var prescriptions = await prescriptionRepository.SelectAllAsQuerableAsync();
+
+        prescriptions = prescriptions.ToPaginate(@params);
+
+        return mapper.Map<IEnumerable<PrescriptionViewModel>>(prescriptions);
     }
 
     public async Task<PrescriptionViewModel> GetByIdAsync(long id)
     {
         var existPrescription = (await prescriptionRepository.SelectAllAsQuerableAsync()).FirstOrDefault(p => p.Id == id && !p.IsDeleted)
-      ?? throw new NotFoundException($"Prescription is not found with this Id {id}");
+            ?? throw new NotFoundException($"Prescription is not found with this Id {id}");
 
-        return Mapper.Map(existPrescription);
+        return mapper.Map<PrescriptionViewModel>(existPrescription);
     }
 
     public async Task<PrescriptionViewModel> UpdateAsync(long id, PrescriptionUpdateModel model)
@@ -71,14 +70,12 @@ public class PrescriptionService : IPrescriptionService
         if (notUpdatedPrescription is not null)
             throw new AlreadyExistException($"This Prescription is not updated, because the Doctor from {model.DoctorId} Id is bisy from {model.DateTime} time");
 
-        existPrescription.DateTime = model.DateTime;
-        existPrescription.DoctorId = model.DoctorId;
-        existPrescription.UserId = model.UserId;
+        mapper.Map(model, existPrescription);
         existPrescription.UpdatedAt = DateTime.UtcNow;
 
         var updatedPrescription = await prescriptionRepository.UpdateAsync(existPrescription);
         await prescriptionRepository.SaveAsync();
 
-        return Mapper.Map(updatedPrescription);
+        return mapper.Map<PrescriptionViewModel>(updatedPrescription);
     }
 }
