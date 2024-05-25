@@ -43,28 +43,27 @@ public class UserRepository : IUserRepository
         return user;
     }
 
-    public async Task<IEnumerable<User>> SelectAllAsEnumerableAsync(bool isTraking = true)
+    public async Task<IQueryable<User>> SelectAllAsQuerableAsync(string[] includes = null, bool isTraking = true)
     {
-        var users = context.Users.Include("Appointments").Include("Prescriptions").Include("Prescriptions");
+        var users = context.Users.Where(u => !u.IsDeleted);
+
+        if(includes is not null) 
+           foreach(var include in includes) 
+                users = users.Include(include);
 
         if (!isTraking)
             users.AsNoTracking();
 
-        return await Task.FromResult(users.Where(user => !user.IsDeleted));
-    }
-
-    public async Task<IQueryable<User>> SelectAllAsQuerableAsync(bool isTraking = true)
-    {
-        var users = context.Users.Include("Appointments").Include("Prescriptions").Include("Prescriptions");
-
-        if (!isTraking)
-            users.AsNoTracking();
-
-        return await Task.FromResult(users.AsQueryable().Where(user => !user.IsDeleted));        
+        return await Task.FromResult(users);        
     }
 
     public async Task<bool> SaveAsync()
     {
        return (await context.SaveChangesAsync()) > 0;
+    }
+
+    public Task<IEnumerable<User>> SelectAllAsEnumerableAsync(string[] includes = null, bool isTraking = true)
+    {
+        throw new NotImplementedException();
     }
 }

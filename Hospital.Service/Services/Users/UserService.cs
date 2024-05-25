@@ -63,7 +63,7 @@ public class UserService
 
     public async Task<IEnumerable<UserViewModel>> GetAllAsync(PaginationParams @params)
     {
-        var users = await userRepository.SelectAllAsQuerableAsync();
+        var users = await userRepository.SelectAllAsQuerableAsync(["Appointments", "Contact", "Prescriptions"], isTraking: false);
 
         users = users.ToPaginate(@params);
 
