@@ -38,32 +38,41 @@ public class UserRepository : IUserRepository
             foreach (var include in includes)
                 users.Include(include);
 
-        var user = await users.Where(u => u.Id == id && !u.IsDeleted).FirstAsync();
+        var user = await users.Where(u => u.Id == id && !u.IsDeleted).FirstOrDefaultAsync();
 
         return user;
     }
 
     public async Task<IQueryable<User>> SelectAllAsQuerableAsync(string[] includes = null, bool isTraking = true)
     {
-        var users = context.Users.Where(u => !u.IsDeleted);
+        var users = context.Users;
 
         if(includes is not null) 
            foreach(var include in includes) 
-                users = users.Include(include);
+                users.Include(include);
 
         if (!isTraking)
             users.AsNoTracking();
 
-        return await Task.FromResult(users);        
+        return await Task.FromResult(users.AsQueryable().Where(user => !user.IsDeleted));
+    }
+
+    public async Task<IEnumerable<User>> SelectAllAsEnumerableAsync(string[] includes = null, bool isTraking = true)
+    {
+        var users = context.Users;
+
+        if (includes is not null)
+            foreach (var include in includes)
+                users.Include(include);
+
+        if (!isTraking)
+            users.AsNoTracking();
+
+        return await users.Where(user => !user.IsDeleted).ToListAsync();
     }
 
     public async Task<bool> SaveAsync()
     {
        return (await context.SaveChangesAsync()) > 0;
-    }
-
-    public Task<IEnumerable<User>> SelectAllAsEnumerableAsync(string[] includes = null, bool isTraking = true)
-    {
-        throw new NotImplementedException();
     }
 }
