@@ -30,39 +30,49 @@ public class PrescriptionRepository : IPrescriptionRepository
         return await Task.FromResult(prescription);
     }
 
-    public async Task<Prescription> SelectAsync(long id, string include = null)
+    public async Task<Prescription> SelectAsync(long id, string[] includes = null)
     {
         var prescriptions = context.Prescriptions;
-        if (include is not null)
-            prescriptions.Include(include);
+
+        if (includes is not null)
+            foreach (var include in includes)
+                prescriptions.Include(include); ;
 
         var prescription = await prescriptions.Where(pr => !pr.IsDeleted && pr.Id == id).FirstOrDefaultAsync();
 
         return prescription;
     }
 
-    public async Task<IEnumerable<Prescription>> SelectAllAsEnumerableAsync(string[] includes = null)
+    public async Task<IEnumerable<Prescription>> SelectAllAsEnumerableAsync(string[] includes = null, bool isTracking = true)
     {
         var prescriptions = context.Prescriptions;
+
         if (includes is not null)
             foreach (var include in includes)
                 prescriptions.Include(include);
 
+        if (!isTracking)
+            prescriptions.AsNoTracking();
+
         return await prescriptions.Where(pr => !pr.IsDeleted).ToListAsync();
     }
 
-    public async Task<IQueryable<Prescription>> SelectAllAsQuerableAsync(string[] includes = null)
+    public async Task<IQueryable<Prescription>> SelectAllAsQuerableAsync(string[] includes = null, bool isTracking = true)
     {
         var prescriptions = context.Prescriptions;
+
         if(includes is not null)
             foreach (var include in includes)
                 prescriptions.Include(include);
+
+        if (!isTracking)
+            prescriptions.AsNoTracking();
 
         return await Task.FromResult(prescriptions.AsQueryable().Where(pr => !pr.IsDeleted));
     }
 
     public async Task<bool> SaveAsync()
     {
-        return (await context.SaveChangesAsync()) > 0;  //  we use > 0 🧘
+        return (await context.SaveChangesAsync()) > 0; 
     }
 }
