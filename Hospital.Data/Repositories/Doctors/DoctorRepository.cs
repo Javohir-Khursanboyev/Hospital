@@ -33,22 +33,38 @@ public class DoctorRepository : IDoctorRepository
     public async Task<Doctor> SelectAsync(long id, string[] includes = null)
     {
         var doctors = context.Doctors;
+
         if(includes is not null) 
             foreach(var include in includes) 
                 doctors.Include(include);
 
-        var doctor = await doctors.Where(doctor => !doctor.IsDeleted).FirstOrDefaultAsync();
-        return doctor;
+        return await doctors.Where(doctor => !doctor.IsDeleted && doctor.Id == id).FirstOrDefaultAsync();    
     }
-    public async Task<IEnumerable<Doctor>> SelectAllAsEnumerableAsync()
+    public async Task<IEnumerable<Doctor>> SelectAllAsEnumerableAsync(string[] includes = null, bool isTraking = true)
     {
-        var doctors = context.Doctors.Include("Appointments").Include("Prescriptions");
+        var doctors = context.Doctors;
+
+        if (includes is not null)
+            foreach (var include in includes)
+                doctors.Include(include);
+
+        if (!isTraking)
+            doctors.AsNoTracking();
+
         return await doctors.Where(doctor => !doctor.IsDeleted).ToListAsync();
     }
 
-    public async Task<IQueryable<Doctor>> SelectAllAsQuerableAsync()
+    public async Task<IQueryable<Doctor>> SelectAllAsQuerableAsync(string[] includes = null, bool isTraking = true)
     {
-        var doctors = context.Doctors.Include("Appointments").Include("Prescriptions");
+        var doctors = context.Doctors;
+
+        if (includes is not null)
+            foreach (var include in includes)
+                doctors.Include(include);
+
+        if (!isTraking)
+            doctors.AsNoTracking();
+
         return await Task.FromResult(doctors.AsQueryable().Where(doctor => !doctor.IsDeleted));
     }
 
