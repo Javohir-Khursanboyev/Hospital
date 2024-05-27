@@ -64,7 +64,7 @@ namespace Hospital.WebApi.Controllers
             {
                 StatusCode = 200,
                 Message = "Succes",
-                Data = await doctorService.GetAllAsync(@params)
+                Data = await doctorService.GetAllAsync()
             });
         }
     }

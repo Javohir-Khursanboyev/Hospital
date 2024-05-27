@@ -58,13 +58,13 @@ namespace Hospital.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params)
+        public async Task<IActionResult> GetAllAsync()
         {
             return Ok(new Response
             {
                 StatusCode = 200,
                 Message = "Succes",
-                Data = await appiontmentService.GetAllAsync(@params)
+                Data = await appiontmentService.GetAllAsync()
             });
         }
     }

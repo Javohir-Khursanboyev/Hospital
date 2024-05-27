@@ -24,8 +24,9 @@ public class PrescriptionItemService(IMapper mapper, IPrescriptionItemRepo presc
 
     public async Task<bool> DeleteAsync(long id)
     {
-        var existPrescriptionItem = (await prescriptionItemRepo.SelectAllAsQuerableAsync()).FirstOrDefault(p => p.Id == id && !p.IsDeleted)
-       ?? throw new NotFoundException($"Prescription Item is not found with this Id {id}");
+        var existPrescriptionItem = await prescriptionItemRepo.SelectAsync(id)
+            ?? throw new NotFoundException($"Prescription Item is not found with this Id {id}");
+
         existPrescriptionItem.DeletedAt = DateTime.UtcNow;
         await prescriptionItemRepo.DeleteAsync(existPrescriptionItem);
         await prescriptionItemRepo.SaveAsync();
@@ -43,8 +44,8 @@ public class PrescriptionItemService(IMapper mapper, IPrescriptionItemRepo presc
 
     public async Task<PrescriptionItemViewModel> GetByIdAsync(long id)
     {
-        var existPrescriptionItem = (await prescriptionItemRepo.SelectAllAsQuerableAsync()).FirstOrDefault(p => p.Id == id && !p.IsDeleted)
-        ?? throw new NotFoundException($"Prescription Item is not found with this Id {id}");
+        var existPrescriptionItem = await prescriptionItemRepo.SelectAsync(id)
+            ?? throw new NotFoundException($"Prescription Item is not found with this Id {id}");
 
         return mapper.Map<PrescriptionItemViewModel>(existPrescriptionItem);
     }
