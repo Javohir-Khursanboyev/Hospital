@@ -2,6 +2,7 @@
 using Hospital.Data.Repositories;
 using Hospital.Domain.Entities;
 using Hospital.Service.Configurations;
+using Hospital.Service.DTOs.Commons;
 using Hospital.Service.DTOs.Users;
 using Hospital.Service.Exceptions;
 using Hospital.Service.Extensions;
@@ -68,5 +69,24 @@ public class UserService
         users = users.ToPaginate(@params);
 
         return mapper.Map<IEnumerable<UserViewModel>>(users);
+    }
+
+    public async Task<UserViewModel> ChangePasswordAysnc(long id, ChangePasswordModel changePassword)
+    {
+        var existUser = await userRepository.SelectAsync(id, includes: ["Appointments", "Contact", "Prescriptions"])
+           ?? throw new NotFoundException($"User is not found with this Id {id}");
+
+        if (!PasswordHasher.Verify(changePassword.OldPassword, existUser.Password))
+            throw new CustomException(400, "Password is incorrect");
+
+        if (changePassword.NewPassword != changePassword.ConfirmPassword)
+            throw new CustomException(400, "");
+
+        existUser.Password = PasswordHasher.Hash(changePassword.NewPassword);
+        existUser.UpdatedAt = DateTime.UtcNow;
+        var updatedUser = await userRepository.UpdateAsync(existUser);
+        await userRepository.SaveAsync();
+
+        return mapper.Map<UserViewModel>(updatedUser);
     }
 }
