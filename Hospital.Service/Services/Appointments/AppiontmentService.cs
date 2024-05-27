@@ -24,7 +24,7 @@ namespace Hospital.Service.Services.Appointments
 
             var existAppointment = (await appointmentRepository
                 .SelectAllAsQuerableAsync())
-                .FirstOrDefault(a => a.UserId == model.UserId && a.DoctorId == model.DoctorId && a.DateTime == model.DateTime && !a.IsDeleted)
+                .FirstOrDefault(a => a.UserId == model.UserId && a.DoctorId == model.DoctorId && a.DateTime == model.DateTime)
                     ?? throw new AlreadyExistException($"Appointment is already exist with this User {model.UserId} Id and Doctor {model.DoctorId} Id from {model.DateTime}");
 
             var mappedAppointment = mapper.Map<Appointment>(model);
