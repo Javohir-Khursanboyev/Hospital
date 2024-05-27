@@ -1,7 +1,6 @@
 ﻿using Hospital.Data.DbContexts;
 using Hospital.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Numerics;
 
 namespace Hospital.Data.Repositories.PrescriptionItems;
 
@@ -31,26 +30,44 @@ public class PrescriptionItemRepo : IPrescriptionItemRepo
         return await Task.FromResult(prescriptionItem);
     }
 
-    public async Task<PrescriptionItem> SelectAsync(long id, string include = null)
+    public async Task<PrescriptionItem> SelectAsync(long id, string[] includes = null)
     {
         var prescriptionItems = context.PrescriptionItems;
-        if(include is not null)
-            prescriptionItems.Include(include);
+
+        if (includes != null)
+            foreach (var include in includes)
+                prescriptionItems.Include(include);
                    
-        var prescriptionItem = await prescriptionItems.Where(prItem => !prItem.IsDeleted).FirstOrDefaultAsync();
+        var prescriptionItem = await prescriptionItems.Where(prItem => !prItem.IsDeleted && prItem.Id == id).FirstOrDefaultAsync();
 
         return  prescriptionItem;
     }
 
-    public async Task<IEnumerable<PrescriptionItem>> SelectAllAsEnumerableAsync()
+    public async Task<IEnumerable<PrescriptionItem>> SelectAllAsEnumerableAsync(string[] includes = null, bool isTraking = true)
     {
-        var prescriptionItems = context.PrescriptionItems.Include("Prescription");
+        var prescriptionItems = context.PrescriptionItems;
+
+        if (includes != null)
+            foreach (var include in includes)
+                prescriptionItems.Include(include);
+
+        if (!isTraking)
+            prescriptionItems.AsNoTracking();
+
         return await prescriptionItems.Where(prItem => !prItem.IsDeleted).ToListAsync();
     }
 
-    public async Task<IQueryable<PrescriptionItem>> SelectAllAsQuerableAsync()
+    public async Task<IQueryable<PrescriptionItem>> SelectAllAsQuerableAsync(string[] includes = null, bool isTraking = true)
     {
-        var prescriptionItems = context.PrescriptionItems.Include("Prescription");
+        var prescriptionItems = context.PrescriptionItems;
+
+        if (includes != null)
+            foreach (var include in includes)
+                prescriptionItems.Include(include);
+
+        if (!isTraking)
+            prescriptionItems.AsNoTracking();
+
         return await Task.FromResult(prescriptionItems.AsQueryable().Where(prItem => !prItem.IsDeleted));
     }
 
@@ -58,5 +75,4 @@ public class PrescriptionItemRepo : IPrescriptionItemRepo
     {
         return (await context.SaveChangesAsync()) > 0;
     }
-
 }
