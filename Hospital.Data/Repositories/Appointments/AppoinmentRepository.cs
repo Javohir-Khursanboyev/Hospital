@@ -33,23 +33,39 @@ namespace Hospital.Data.Repositories.Appointments
         public async Task<Appointment> SelectAsync(long id, string[] includes = null)
         {
             var appointments = context.Appointments;
+
             if(includes is not null) 
                 foreach(var include in includes)
                     appointments.Include(include);
 
-            var appointment = await appointments.Where(app => !app.IsDeleted).FirstOrDefaultAsync();
-            return appointment;
+            return  await appointments.Where(app => !app.IsDeleted && app.Id == id).FirstOrDefaultAsync();           
         }
 
-        public async Task<IEnumerable<Appointment>> SelectAllAsEnumerableAsync()
+        public async Task<IEnumerable<Appointment>> SelectAllAsEnumerableAsync(string[] includes = null, bool isTraking = true)
         {
-            var appointments = context.Appointments.Include("User").Include("Doctor");
+            var appointments = context.Appointments;
+
+            if (includes is not null)
+                foreach (var include in includes)
+                    appointments.Include(include);
+
+            if (!isTraking)
+                appointments.AsNoTracking();
+
             return await appointments.Where(appointment => !appointment.IsDeleted).ToListAsync();
         }
 
-        public async Task<IQueryable<Appointment>> SelectAllAsQuerableAsync()
+        public async Task<IQueryable<Appointment>> SelectAllAsQuerableAsync(string[] includes = null, bool isTraking = true)
         {
-            var appointments = context.Appointments.Include("User").Include("Doctor");
+            var appointments = context.Appointments;
+
+            if (includes is not null)
+                foreach (var include in includes)
+                    appointments.Include(include);
+
+            if (!isTraking)
+                appointments.AsNoTracking();
+
             return await Task.FromResult(appointments.AsQueryable().Where(appointment => !appointment.IsDeleted));
         }
 
