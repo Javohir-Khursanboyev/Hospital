@@ -1,27 +1,21 @@
 ﻿using AutoMapper;
 using Hospital.Data.Repositories.Appointments;
 using Hospital.Domain.Entities;
+using Hospital.Service.Configurations;
 using Hospital.Service.DTOs.Appointments;
 using Hospital.Service.Exceptions;
-using Hospital.Service.Mappers;
+using Hospital.Service.Extensions;
 using Hospital.Service.Services.Doctors;
 using Hospital.Service.Users;
 
 namespace Hospital.Service.Services.Appointments
 {
-    public class AppiontmentService : IAppiontmentService
+    public class AppiontmentService
+        (IMapper mapper,
+        IAppointmentRepository appointmentRepository,
+        IUserService userService,
+        IDoctorService doctorService) : IAppiontmentService
     {
-        private readonly IMapper mapper;
-        private readonly IAppointmentRepository appointmentRepository;
-        private readonly IUserService userService;
-        private readonly IDoctorService doctorService;
-        public AppiontmentService(IAppointmentRepository appointmentRepository, IDoctorService doctorService, IUserService userService, IMapper mapper)
-        {
-            this.appointmentRepository = appointmentRepository;
-            this.userService = userService;
-            this.doctorService = doctorService;
-            this.mapper = mapper;
-        }
 
         public async Task<AppointmentViewModel> CreateAsync(AppointmentCreateModel model)
         {
@@ -73,9 +67,12 @@ namespace Hospital.Service.Services.Appointments
             return true;
         }
 
-        public async Task<IEnumerable<AppointmentViewModel>> GetAllAsync()
+        public async Task<IEnumerable<AppointmentViewModel>> GetAllAsync(PaginationParams @params)
         {
-            var appointments = await appointmentRepository.SelectAllAsEnumerableAsync();
+            var appointments = await appointmentRepository.SelectAllAsQuerableAsync(["Doctor", "User"], isTraking: false);
+
+            appointments = appointments.ToPaginate(@params);
+
             return mapper.Map<IEnumerable<AppointmentViewModel>>(appointments);
         }
 

@@ -1,4 +1,5 @@
-﻿using Hospital.Service.DTOs.Appointments;
+﻿using Hospital.Service.Configurations;
+using Hospital.Service.DTOs.Appointments;
 
 namespace Hospital.Service.Services.Appointments;
 
@@ -8,5 +9,5 @@ public interface IAppiontmentService
     Task<AppointmentViewModel> UpdateAsync(long id, AppointmentUpdateModel model);
     Task<bool> DeleteAsync(long id);
     Task<AppointmentViewModel> GetByIdAsync(long id);
-    Task<IEnumerable<AppointmentViewModel>> GetAllAsync();
+    Task<IEnumerable<AppointmentViewModel>> GetAllAsync(PaginationParams @params);
 }
