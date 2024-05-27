@@ -14,7 +14,7 @@ public class DoctorService
 {
     public async Task<DoctorViewModel> CreateAsync(DoctorCreateModel model)
     {
-        var existDoctor = (await doctorRepository.SelectAllAsQuerableAsync()).FirstOrDefault(doctor => doctor.Email == model.Email && !doctor.IsDeleted);
+        var existDoctor = (await doctorRepository.SelectAllAsQuerableAsync()).FirstOrDefault(doctor => doctor.Email == model.Email);
         if (existDoctor is not null)
             throw new AlreadyExistException($"Doctor is already exist with this email {model.Email}");
 
