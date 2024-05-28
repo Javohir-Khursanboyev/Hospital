@@ -58,7 +58,7 @@ namespace Hospital.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllAsync(PaginationParams @params)
+        public async Task<IActionResult> GetAllAsync([FromQuery] PaginationParams @params)
         {
             return Ok(new Response
             {
