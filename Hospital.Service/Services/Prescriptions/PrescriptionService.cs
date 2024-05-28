@@ -1,44 +1,60 @@
-﻿using Hospital.Data.Repositories.Prescriptions;
+﻿using AutoMapper;
+using Hospital.Data.Repositories.Prescriptions;
+using Hospital.Domain.Entities;
+using Hospital.Service.Configurations;
 using Hospital.Service.DTOs.Prescription;
 using Hospital.Service.Exceptions;
-using Hospital.Service.Mappers;
+using Hospital.Service.Extensions;
 using Hospital.Service.Services.Doctors;
 using Hospital.Service.Users;
 
 namespace Hospital.Service.Services.Prescriptions;
-public class PrescriptionService : IPrescriptionService
+public class PrescriptionService(
+    IMapper mapper,
+    IPrescriptionRepository prescriptionRepository,
+    IDoctorService doctorService,
+    IUserService userService) : IPrescriptionService
 {
-    private readonly IPrescriptionRepository prescriptionRepository;
-    private readonly IUserService userService;
-    private readonly IDoctorService doctorService;
-    public PrescriptionService(IPrescriptionRepository prescriptionRepository, IDoctorService doctorService, IUserService userService)
-    {
-        this.prescriptionRepository = prescriptionRepository;
-        this.userService = userService;
-        this.doctorService = doctorService;
-    }
-
-
     public async Task<PrescriptionViewModel> CreateAsync(PrescriptionCreateModel model)
     {
-        var existDoctor = doctorService.GetByIdAsync(model.DoctorId);
         var existUser = userService.GetByIdAsync(model.UserId);
+        var existDoctor = doctorService.GetByIdAsync(model.DoctorId);
 
-        var existPrescription = (await prescriptionRepository.SelectAllAsQuerableAsync())
-            .FirstOrDefault(p => p.UserId == model.UserId && p.DoctorId == model.DoctorId && p.DateTime == model.DateTime && !p.IsDeleted)
-            ?? throw new AlreadyExistException($"Prescription is already exist with this User {model.UserId} Id and Doctor {model.DoctorId} Id from {model.DateTime}");
+        var existPrescription = (await prescriptionRepository
+            .SelectAllAsQuerableAsync())
+            .FirstOrDefault(prescription => prescription.DoctorId == prescription.DoctorId
+            && prescription.DateTime == model.DateTime);
+        if (existPrescription is not null)
+            throw new AlreadyExistException($"Prescription is already exist with this Doctor Id {model.DoctorId} and Date {model.DateTime}");
 
-        var mappedPrescription = Mapper.Map(model);
-        var createdPrescription = await prescriptionRepository.InsertAsync(mappedPrescription);
+        var prescription = mapper.Map<Prescription>(model);
+        var createdPrescription = await prescriptionRepository.InsertAsync(prescription);
         await prescriptionRepository.SaveAsync();
 
-        return Mapper.Map(createdPrescription);
+        return mapper.Map<PrescriptionViewModel>(createdPrescription);
+    }
+
+    public async Task<PrescriptionViewModel> UpdateAsync(long id, PrescriptionUpdateModel model)
+    {
+
+        var existUser = await userService.GetByIdAsync(model.UserId);
+        var existDoctor = await doctorService.GetByIdAsync(model.DoctorId);
+        var existPrescription = await prescriptionRepository.SelectAsync(id)
+            ?? throw new NotFoundException($"Prescription is not found with this id: {id}");
+
+        mapper.Map(model, existPrescription);
+        existPrescription.DateTime = DateTime.UtcNow;
+
+        var updatedPrescription = await prescriptionRepository.UpdateAsync(existPrescription);
+        await prescriptionRepository.SaveAsync();
+
+        return mapper.Map<PrescriptionViewModel>(updatedPrescription);
     }
 
     public async Task<bool> DeleteAsync(long id)
     {
-        var existPrescription = (await prescriptionRepository.SelectAllAsQuerableAsync()).FirstOrDefault(p => p.Id == id && !p.IsDeleted)
-       ?? throw new NotFoundException($"Prescription is not found with this Id {id}");
+        var existPrescription = await prescriptionRepository.SelectAsync(id)
+           ?? throw new NotFoundException($"Prescription is not found with this Id {id}");
 
         existPrescription.DeletedAt = DateTime.UtcNow;
         await prescriptionRepository.DeleteAsync(existPrescription);
@@ -47,38 +63,19 @@ public class PrescriptionService : IPrescriptionService
         return true;
     }
 
-    public async Task<IEnumerable<PrescriptionViewModel>> GetAllAsync()
-    {
-        var prescriptions = await prescriptionRepository.SelectAllAsEnumerableAsync();
-        return Mapper.Map(prescriptions);
-    }
-
     public async Task<PrescriptionViewModel> GetByIdAsync(long id)
     {
-        var existPrescription = (await prescriptionRepository.SelectAllAsQuerableAsync()).FirstOrDefault(p => p.Id == id && !p.IsDeleted)
-      ?? throw new NotFoundException($"Prescription is not found with this Id {id}");
+        var existPrescription = await prescriptionRepository.SelectAsync(id, includes: ["Doctor", "User", "PrescriptionItems"])
+           ?? throw new NotFoundException($"Prescription is not found with this Id {id}");
 
-        return Mapper.Map(existPrescription);
+        return mapper.Map<PrescriptionViewModel>(existPrescription);
     }
 
-    public async Task<PrescriptionViewModel> UpdateAsync(long id, PrescriptionUpdateModel model)
+    public async Task<IEnumerable<PrescriptionViewModel>> GetAllAsync(PaginationParams @params)
     {
-        var existPrescription = (await prescriptionRepository.SelectAllAsQuerableAsync()).FirstOrDefault(p => p.Id == id && !p.IsDeleted)
-         ?? throw new NotFoundException($"Prescription is not found with this id: {id}");
+        var prescriptions = await prescriptionRepository.SelectAllAsQuerableAsync(["Doctor", "User", "PrescriptionItems"], isTracking: false);
+        prescriptions = prescriptions.ToPaginate(@params);
 
-        var notUpdatedPrescription = (await prescriptionRepository.SelectAllAsQuerableAsync())
-            .FirstOrDefault(p => p.Id != id && !p.IsDeleted && p.DoctorId == model.DoctorId && p.DateTime == model.DateTime);
-        if (notUpdatedPrescription is not null)
-            throw new AlreadyExistException($"This Prescription is not updated, because the Doctor from {model.DoctorId} Id is bisy from {model.DateTime} time");
-
-        existPrescription.DateTime = model.DateTime;
-        existPrescription.DoctorId = model.DoctorId;
-        existPrescription.UserId = model.UserId;
-        existPrescription.UpdatedAt = DateTime.UtcNow;
-
-        var updatedPrescription = await prescriptionRepository.UpdateAsync(existPrescription);
-        await prescriptionRepository.SaveAsync();
-
-        return Mapper.Map(updatedPrescription);
+        return mapper.Map<IEnumerable<PrescriptionViewModel>>(prescriptions);
     }
 }
