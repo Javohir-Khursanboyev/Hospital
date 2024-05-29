@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>
     (option => option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddExceptionHandler<NotFoundExceptionMiddleware>();
+builder.Services.AddExceptionHandler<AlreadyExistExceptionMiddleware>();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddEndpointsApiExplorer();
