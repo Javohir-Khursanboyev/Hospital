@@ -8,6 +8,7 @@ using Hospital.Service.Services.Doctors;
 using Hospital.Service.Services.PrescriptionItems;
 using Hospital.Service.Services.Prescriptions;
 using Hospital.Service.Users;
+using Hospital.WebApi.Middlewares;
 
 namespace Hospital.WebApi.Extensions;
 
@@ -31,5 +32,13 @@ public static class ServicesExtension
         services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
         services.AddScoped<IPrescriptionItemRepo, PrescriptionItemRepo>();
 
+    }
+
+    public static void AddExceptionHandlers(this IServiceCollection services)
+    {
+        services.AddExceptionHandler<NotFoundExceptionMiddleware>();
+        services.AddExceptionHandler<AlreadyExistExceptionMiddleware>();
+        services.AddExceptionHandler<CustomExceptionMiddleware>();
+        services.AddExceptionHandler<InternalServerExceptionMiddleware>();
     }
 }

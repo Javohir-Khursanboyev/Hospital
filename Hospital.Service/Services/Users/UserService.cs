@@ -33,6 +33,11 @@ public class UserService
         var existUser = await userRepository.SelectAsync(id)
             ?? throw new NotFoundException($"User is not found with this id: {id}");
 
+        var alreadyExistUser = (await userRepository.SelectAllAsQuerableAsync()).FirstOrDefault(u => u.Email == model.Email && u.Id !=id);
+
+        if (alreadyExistUser is not null)
+            throw new AlreadyExistException($"User is already exist this email {model.Email}");
+
         mapper.Map(model, existUser);
         existUser.UpdatedAt = DateTime.UtcNow;
 

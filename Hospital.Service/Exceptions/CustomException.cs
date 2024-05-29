@@ -9,5 +9,3 @@ public class CustomException : Exception
         StatusCode = code;
     }
 }
-
- 

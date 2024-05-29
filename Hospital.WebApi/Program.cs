@@ -14,10 +14,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddDbContext<AppDbContext>
     (option => option.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddExceptionHandler<NotFoundExceptionMiddleware>();
-builder.Services.AddExceptionHandler<AlreadyExistExceptionMiddleware>();
-builder.Services.AddExceptionHandler<CustomExceptionMiddleware>();
-builder.Services.AddExceptionHandler<InternalServerExceptionMiddleware>();
+builder.Services.AddExceptionHandlers();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddEndpointsApiExplorer();
