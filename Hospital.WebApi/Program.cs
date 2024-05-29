@@ -16,6 +16,7 @@ builder.Services.AddDbContext<AppDbContext>
 
 builder.Services.AddExceptionHandler<NotFoundExceptionMiddleware>();
 builder.Services.AddExceptionHandler<CustomExceptionMiddleware>();
+builder.Services.AddExceptionHandler<InternalServerExceptionMiddleware>();
 builder.Services.AddProblemDetails();
 
 builder.Services.AddEndpointsApiExplorer();
