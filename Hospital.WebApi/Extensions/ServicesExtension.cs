@@ -1,9 +1,12 @@
 ﻿using Hospital.Data.Repositories;
 using Hospital.Data.Repositories.Appointments;
+using Hospital.Data.Repositories.Assets;
 using Hospital.Data.Repositories.Doctors;
 using Hospital.Data.Repositories.PrescriptionItems;
 using Hospital.Data.Repositories.Prescriptions;
+using Hospital.Service.Helpers;
 using Hospital.Service.Services.Appointments;
+using Hospital.Service.Services.Assets;
 using Hospital.Service.Services.Doctors;
 using Hospital.Service.Services.PrescriptionItems;
 using Hospital.Service.Services.Prescriptions;
@@ -21,7 +24,7 @@ public static class ServicesExtension
         services.AddScoped<IAppiontmentService, AppiontmentService>();
         services.AddScoped<IPrescriptionService, PrescriptionService>();
         services.AddScoped<IPrescriptionItemService, PrescriptionItemService>();
-
+        services.AddScoped<IAssetService, AssetService>();
     }
 
     public static void AddRepositories(this IServiceCollection services)
@@ -31,11 +34,14 @@ public static class ServicesExtension
         services.AddScoped<IAppointmentRepository, AppoinmentRepository>();
         services.AddScoped<IPrescriptionRepository, PrescriptionRepository>();
         services.AddScoped<IPrescriptionItemRepo, PrescriptionItemRepo>();
+        services.AddScoped<IAssetRepository, AssetRepository>();
 
     }
 
     public static void AddExceptionHandlers(this IServiceCollection services)
     {
+        FilePathHelper.WwwrootPath = Path.GetFullPath("wwwroot");
+
         services.AddExceptionHandler<NotFoundExceptionMiddleware>();
         services.AddExceptionHandler<AlreadyExistExceptionMiddleware>();
         services.AddExceptionHandler<CustomExceptionMiddleware>();

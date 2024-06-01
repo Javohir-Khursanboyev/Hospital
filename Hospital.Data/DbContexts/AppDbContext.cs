@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Prescription> Prescriptions { get; set; }
     public DbSet<PrescriptionItem> PrescriptionItems { get; set; }
     public DbSet<UserContact> UserContacts { get; set; }
+    public DbSet<Asset> Assets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

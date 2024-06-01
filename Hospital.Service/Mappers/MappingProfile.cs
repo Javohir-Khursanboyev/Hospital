@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Hospital.Domain.Entities;
 using Hospital.Service.DTOs.Appointments;
+using Hospital.Service.DTOs.Assets;
 using Hospital.Service.DTOs.Doctors;
 using Hospital.Service.DTOs.Prescription;
 using Hospital.Service.DTOs.PrescriptionItems;
@@ -12,6 +13,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
+        CreateMap<Asset, AssetViewModel>().ReverseMap();
+
         CreateMap<UserCreateModel, User>().ReverseMap();
         CreateMap<UserUpdateModel, User>().ReverseMap();
         CreateMap<User, UserViewModel>().ReverseMap();
